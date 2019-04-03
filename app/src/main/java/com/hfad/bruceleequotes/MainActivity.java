@@ -8,10 +8,10 @@ import android.widget.TextView;
 import android.content.Context;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     private static MainActivity instance;
     private QuoteExpert expert;
     private String currentQuote;
-    //private List<String> quoteList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,5 +45,11 @@ public class MainActivity extends AppCompatActivity {
         currentQuote = expert.getRandomQuote();
         TextView quote = (TextView) findViewById(R.id.quote);
         quote.setText(currentQuote);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: activity is destroyed");
     }
 }
