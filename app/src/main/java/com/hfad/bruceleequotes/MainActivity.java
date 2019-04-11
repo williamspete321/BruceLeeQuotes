@@ -1,55 +1,71 @@
 package com.hfad.bruceleequotes;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.content.Context;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
-    private static MainActivity instance;
     private QuoteExpert expert;
     private String currentQuote;
+    private TextView quote;
+    private static final String KEY_QUOTE = "quote";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        instance = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        quote = (TextView) findViewById(R.id.quote);
         if(savedInstanceState != null) {
-            currentQuote = savedInstanceState.getString("quote");
-            TextView quote = (TextView) findViewById(R.id.quote);
+            currentQuote = savedInstanceState.getString(KEY_QUOTE);
             quote.setText(currentQuote);
         }
-        expert = new QuoteExpert();
+        expert = new QuoteExpert(getApplicationContext());
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("quote", currentQuote);
+            savedInstanceState.putString(KEY_QUOTE, currentQuote);
     }
 
-    public static MainActivity getInstance() {
-        return instance;
-    }
+    public void onClickCopyQuote(View view) {
+        if(currentQuote != null) {
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText(KEY_QUOTE, "\"" + currentQuote + "\" -Bruce Lee");
+            clipboardManager.setPrimaryClip(clipData);
 
-    public static Context getContext(){
-        Log.d("testMessage", "we are using the getContext() method I made");
-        return instance.getApplicationContext();
+            Toast.makeText(MainActivity.this, "Copied", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MainActivity.this, "No Quote To Copy", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onClickFindQuote(View view) {
         currentQuote = expert.getRandomQuote();
-        TextView quote = (TextView) findViewById(R.id.quote);
+        Animation animFadeIn = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_in);
         quote.setText(currentQuote);
+        quote.startAnimation(animFadeIn);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: activity is destroyed");
+    public void onClickShareQuote(View view) {
+        if (currentQuote != null) {
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_SUBJECT, "Bruce Lee Quote");
+            share.putExtra(Intent.EXTRA_TEXT, "\"" + currentQuote + "\" -Bruce Lee");
+            startActivity(Intent.createChooser(share, "Share via"));
+        } else {
+            Toast.makeText(MainActivity.this, "No Quote To Share", Toast.LENGTH_SHORT).show();
+        }
+
     }
+
 }

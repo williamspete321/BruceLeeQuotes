@@ -1,6 +1,7 @@
 package com.hfad.bruceleequotes;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,19 +13,25 @@ import java.util.List;
 import java.util.Random;
 
 public class QuoteExpert {
+    private Context mContext;
     private List<String> quoteList;
 
-    public QuoteExpert() {
+    public QuoteExpert(Context context) {
+        mContext = context;
         quoteList = getQuotes();
     }
 
     private ArrayList<String> getQuotes() {
         ArrayList<String> quotes = new ArrayList<>();
 
-        Context context = MainActivity.getContext();
-        InputStream is = context.getResources().openRawResource(R.raw.bruceleequotes);
         BufferedReader reader;
+        InputStream is;
+        AssetManager manager;
+
         try {
+            manager = mContext.getAssets();
+            is = manager.open("bruceleequotes.txt");
+            //is = mContext.getResources().openRawResource(R.raw.bruceleequotes);
             reader = new BufferedReader(new InputStreamReader(is));
             String line = reader.readLine();
             while (line != null) {
@@ -39,7 +46,6 @@ public class QuoteExpert {
     }
 
     public String getRandomQuote() {
-        Log.d("testMessage", "we are using the getRandomQuote() method I made");
         Random rand = new Random();
         int randomPosition = rand.nextInt(quoteList.size());
         return quoteList.get(randomPosition);

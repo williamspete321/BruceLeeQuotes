@@ -1,45 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.hfad.bruceleequotes.MainActivity"
-    android:background="#3F4149">
+    android:background="@color/colorImageBackground"
+    tools:context="com.hfad.bruceleequotes.MainActivity">
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:alpha="0.3"
         android:scaleType="centerCrop"
-        android:src="@drawable/brucelee"
-        android:alpha="0.3" />
+        android:src="@drawable/brucelee" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/quote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="16dp" >
+        android:fontFamily="sans-serif-black"
+        android:layout_centerInParent="true"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorText"
+        android:textSize="30sp" />
 
-        <TextView
-            android:id="@+id/quote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-black"
-            android:gravity="center"
-            android:padding="16dp"
-            android:textSize="30sp"
-            android:textColor="#FFEB3B"/>
+    <ImageButton
+        android:id="@+id/copy_quote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/find_quote"
+        android:layout_margin="10dp"
+        android:onClick="onClickCopyQuote"
+        android:src="@drawable/copy_medium"
+        android:tint="@color/colorButtonTint"
+        android:background="@drawable/roundcorner"/>
 
-    </LinearLayout>
-
-    <Button
+    <ImageButton
         android:id="@+id/find_quote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="16dp"
-        android:text="@string/find_quote"
-        android:onClick="onClickFindQuote" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        android:onClick="onClickFindQuote"
+        android:src="@drawable/quote_medium"
+        android:tint="@color/colorText"
+        android:background="@drawable/roundcorner"/>
 
-</FrameLayout>
+    <ImageButton
+        android:id="@+id/share_quote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/find_quote"
+        android:layout_margin="10dp"
+        android:onClick="onClickShareQuote"
+        android:src="@drawable/share_medium"
+        android:tint="@color/colorButtonTint"
+        android:background="@drawable/roundcorner"/>
+
+</RelativeLayout>

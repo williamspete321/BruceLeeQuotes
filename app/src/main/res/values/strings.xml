@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Bruce Lee Quotes</string>
+    <string name="copy_quote">Copy Quote</string>
     <string name="find_quote">Find Quote</string>
-    <string name="quote">If you always put limit on everything you do, physical or anything else. It will spread into your work and into your life. There are no limits. There are only plateaus, and you must not stay there, you must go beyond them.</string>
+    <string name="share_quote">Share Quote</string>
 </resources>
