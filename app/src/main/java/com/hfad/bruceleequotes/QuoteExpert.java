@@ -31,7 +31,6 @@ public class QuoteExpert {
         try {
             manager = mContext.getAssets();
             is = manager.open("bruceleequotes.txt");
-            //is = mContext.getResources().openRawResource(R.raw.bruceleequotes);
             reader = new BufferedReader(new InputStreamReader(is));
             String line = reader.readLine();
             while (line != null) {
