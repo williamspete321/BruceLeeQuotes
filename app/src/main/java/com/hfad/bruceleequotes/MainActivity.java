@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
             Cursor cursor = db.query("QUOTE",
                     new String[] {"_id", "FULL_QUOTE"}, // add VIEWED, FAVORITE later
                     "VIEWED = ?",
-                    new String[] {Integer.toString(0)}, //get a random quote
-                    null, null, "RANDOM() limit 1");
+                    new String[] {Integer.toString(0)},
+                    null, null, "RANDOM() limit 1"); //get a random quote
 
             //Move to the first record in the cursor
 

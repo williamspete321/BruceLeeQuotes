@@ -2,25 +2,24 @@ package com.hfad.bruceleequotes;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.view.View;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.List;
 
 public class QuoteDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "quotes";
     private static final int DB_VERSION = 1;
+    private static final String FILE_NAME = "bruceleequotes.txt";
+
+    private List<String> quoteList;
     private Context mContext;
 
     QuoteDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         mContext = context;
+        quoteList = generateQuoteList();
     }
 
     @Override
@@ -42,6 +41,11 @@ public class QuoteDatabaseHelper extends SQLiteOpenHelper {
         db.insert("QUOTE", null, quoteValues);
     }
 
+    private List<String> generateQuoteList() {
+        QuoteReader reader = new QuoteReader(mContext, FILE_NAME);
+        return reader.getQuoteArrayList();
+    }
+
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 1) {
             db.execSQL("CREATE TABLE QUOTE (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -49,23 +53,10 @@ public class QuoteDatabaseHelper extends SQLiteOpenHelper {
             + "VIEWED NUMERIC, "
             + "FAVORITE NUMERIC);");
 
-            BufferedReader reader;
-            InputStream is;
-            AssetManager manager;
-            String nextQuote;
-
-            try {
-                manager = mContext.getAssets();
-                is = manager.open("bruceleequotes.txt");
-                reader = new BufferedReader(new InputStreamReader(is));
-                nextQuote = reader.readLine();
-                while (nextQuote != null) {
-                    insertQuote(db, nextQuote, 0, 0);
-                    nextQuote = reader.readLine();
-                }
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            String nextQuote = "";
+            for(int i=0; i < quoteList.size(); i++) {
+                nextQuote = quoteList.get(i);
+                insertQuote(db, nextQuote, 0, 0);
             }
         }
     }
