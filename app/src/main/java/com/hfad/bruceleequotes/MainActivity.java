@@ -12,43 +12,37 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.haha.perflib.Main;
-
 public class MainActivity extends AppCompatActivity {
-    //private QuoteExpert expert;
     private String currentQuote;
     private TextView quote;
-    private int quoteId;
     private static final String KEY_QUOTE = "quote";
+
+    private QuoteDatabaseManager quoteDatabaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        quoteDatabaseManager = new QuoteDatabaseManager(getApplicationContext());
         quote = (TextView) findViewById(R.id.quote);
-        SQLiteOpenHelper quoteDatabaseHelper = new QuoteDatabaseHelper(getApplicationContext());
 
         if(savedInstanceState != null) {
             currentQuote = savedInstanceState.getString(KEY_QUOTE);
             quote.setText(currentQuote);
         } else {
+            quoteDatabaseManager = new QuoteDatabaseManager(getApplicationContext());
             ContentValues quoteValues = new ContentValues();
             quoteValues.put("VIEWED", false);
             try {
-                SQLiteDatabase db = quoteDatabaseHelper.getWritableDatabase();
-                db.update("QUOTE", quoteValues, null, null);
-                db.close();
+                quoteDatabaseManager.updateAllQuotes(quoteValues);
             } catch (SQLiteException e) {
-                Toast toast = Toast.makeText(this,
-                        "Database unavailable",
-                        Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
@@ -73,36 +67,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickFindQuote(View view) {
-        SQLiteOpenHelper quoteDatabaseHelper = new QuoteDatabaseHelper(getApplicationContext());
         try {
-            SQLiteDatabase db = quoteDatabaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("QUOTE",
-                    new String[] {"_id", "FULL_QUOTE"}, // add VIEWED, FAVORITE later
-                    "VIEWED = ?",
-                    new String[] {Integer.toString(0)},
-                    null, null, "RANDOM() limit 1"); //get a random quote
-
-            //Move to the first record in the cursor
-
+            Cursor cursor = quoteDatabaseManager.getRandomQuote();
             if (cursor.moveToFirst()) {
-                quoteId = cursor.getInt(0);
+                int quoteId = cursor.getInt(0);
                 currentQuote = cursor.getString(1);
                 Animation animFadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
                 quote.setText(currentQuote);
                 quote.startAnimation(animFadeIn);
                 new UpdateQuotesTask().execute(quoteId);
             } else {
-                Toast toast = Toast.makeText(this,
-                        "No new quotes to view",
-                        Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(this, "No new quotes to view", Toast.LENGTH_SHORT);
                 toast.show();
             }
             cursor.close();
-            db.close(); // do I need to close the database here?
         } catch (SQLiteException e) {
-            Toast toast = Toast.makeText(this,
-                    "Database unavailable",
-                    Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
             toast.show();
         }
     }
@@ -119,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Inner class to update the quote
+    //Inner class to update the quote to "VIEWED = true"
     private class UpdateQuotesTask extends AsyncTask<Integer, Void, Boolean> {
         private ContentValues quoteValues;
 
@@ -130,12 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
         protected Boolean doInBackground(Integer... quotes) {
             int quoteId = quotes[0];
-            SQLiteOpenHelper quoteDatabaseHelper = new QuoteDatabaseHelper(getApplicationContext());
             try {
-                SQLiteDatabase db = quoteDatabaseHelper.getWritableDatabase();
-                db.update("QUOTE", quoteValues,
-                        "_id = ?", new String[] {Integer.toString(quoteId)});
-                db.close();
+                quoteDatabaseManager.updateSingleQuote(quoteId, quoteValues);
                 return true;
             } catch (SQLiteException e) {
                 return false;
@@ -144,10 +120,15 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Boolean success) {
             if(!success) {
-                Toast toast = Toast.makeText(MainActivity.this,
-                        "Database unavailable", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        quoteDatabaseManager.close();
+        super.onDestroy();
     }
 }
