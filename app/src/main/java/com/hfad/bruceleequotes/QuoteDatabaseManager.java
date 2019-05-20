@@ -37,10 +37,11 @@ public class QuoteDatabaseManager {
     }
 
     public Cursor getRandomQuote() {
+        //get a random quote from the table that hasn't been viewed yet (VIEWED = 0)
         Cursor cursor = quoteDatabaseOpenHelper.getReadableDatabase().query(TABLE_NAME,
-                new String[] {COL_ID, COL_QUOTE}, // add VIEWED, FAVORITE later
+                new String[] {COL_ID, COL_QUOTE},
                 COL_VIEWED + " = ?", new String[] {Integer.toString(0)},
-                null, null, "RANDOM() limit 1"); //get a random quote
+                null, null, "RANDOM() limit 1");
         return cursor;
     }
 

@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         quoteDatabaseManager = new QuoteDatabaseManager(getApplicationContext());
         quote = (TextView) findViewById(R.id.quote);
 
+
         if(savedInstanceState != null) {
             currentQuote = savedInstanceState.getString(KEY_QUOTE);
             quote.setText(currentQuote);
@@ -42,8 +43,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 quoteDatabaseManager.updateAllQuotes(quoteValues);
             } catch (SQLiteException e) {
-                Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-                toast.show();
+                Toast.makeText(getApplicationContext(), "Database unavailable", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -60,9 +60,9 @@ public class MainActivity extends AppCompatActivity {
             ClipData clipData = ClipData.newPlainText(KEY_QUOTE, "\"" + currentQuote + "\" -Bruce Lee");
             clipboardManager.setPrimaryClip(clipData);
 
-            Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Copied", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "No Quote To Copy", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No Quote To Copy", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -77,13 +77,11 @@ public class MainActivity extends AppCompatActivity {
                 quote.startAnimation(animFadeIn);
                 new UpdateQuotesTask().execute(quoteId);
             } else {
-                Toast toast = Toast.makeText(this, "No new quotes to view", Toast.LENGTH_SHORT);
-                toast.show();
+                Toast.makeText(getApplicationContext(), "No new quotes to view", Toast.LENGTH_SHORT).show();
             }
             cursor.close();
         } catch (SQLiteException e) {
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getApplicationContext(), "Database unavailable", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             share.putExtra(Intent.EXTRA_TEXT, "\"" + currentQuote + "\" -Bruce Lee");
             startActivity(Intent.createChooser(share, "Share via"));
         } else {
-            Toast.makeText(this, "No Quote To Share", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No Quote To Share", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Boolean success) {
             if(!success) {
-                Toast toast = Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT);
-                toast.show();
+                Toast.makeText(MainActivity.this, "Database unavailable", Toast.LENGTH_SHORT).show();
             }
         }
     }
