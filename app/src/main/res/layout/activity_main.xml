@@ -6,6 +6,10 @@
     android:background="@color/colorImageBackground"
     tools:context="com.hfad.bruceleequotes.MainActivity">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,18 +29,6 @@
         android:textSize="30sp" />
 
     <ImageButton
-        android:id="@+id/copy_quote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@id/find_quote"
-        android:layout_margin="10dp"
-        android:onClick="onClickCopyQuote"
-        android:src="@drawable/copy_medium"
-        android:tint="@color/colorButtonTint"
-        android:background="@drawable/roundcorner"/>
-
-    <ImageButton
         android:id="@+id/find_quote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,18 +38,6 @@
         android:onClick="onClickFindQuote"
         android:src="@drawable/quote_medium"
         android:tint="@color/colorText"
-        android:background="@drawable/roundcorner"/>
-
-    <ImageButton
-        android:id="@+id/share_quote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/find_quote"
-        android:layout_margin="10dp"
-        android:onClick="onClickShareQuote"
-        android:src="@drawable/share_medium"
-        android:tint="@color/colorButtonTint"
         android:background="@drawable/roundcorner"/>
 
 </RelativeLayout>

@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,13 +40,33 @@ public class QuoteDatabaseManager {
         //mContext = context;
     }
 
-    public Cursor getRandomQuote() {
+    private Cursor queryNewRandomQuote() {
         //get a random quote from the table that hasn't been viewed yet (VIEWED = 0)
         Cursor cursor = quoteDatabaseOpenHelper.getReadableDatabase().query(TABLE_NAME,
-                new String[] {COL_ID, COL_QUOTE},
+                new String[] {COL_ID, COL_QUOTE, COL_VIEWED, COL_FAVORITE},
                 COL_VIEWED + " = ?", new String[] {Integer.toString(0)},
                 null, null, "RANDOM() limit 1");
         return cursor;
+    }
+
+    public Quote getRandomQuote() {
+        Quote quote = null;
+        try {
+            Cursor cursor = queryNewRandomQuote();
+            if (cursor.moveToFirst()) {
+
+                int id = cursor.getInt(0);
+                String quoteText = cursor.getString(1);
+                boolean quoteIsViewed = (cursor.getInt(2) == 1);
+                boolean quoteIsFavorite = (cursor.getInt(3) == 1);
+
+                quote = new Quote(id, quoteText, quoteIsViewed, quoteIsFavorite);
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+            Log.e(TAG, "Database unavailable");
+        }
+        return quote;
     }
 
     public void updateSingleQuote(int quoteId, ContentValues contentValues) {
@@ -90,21 +114,16 @@ public class QuoteDatabaseManager {
         private void updateMyDatabase(int oldVersion, int newVersion) {
             if (oldVersion < 1) {
                 mDatabase.execSQL(sql);
-                populateDatabase();
+                populateQuotesIntoDatabase();
             }
         }
 
-        private void populateDatabase() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        loadQuotes();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }).start();
+        private void populateQuotesIntoDatabase() {
+            try {
+                loadQuotes();
+            } catch (IOException e) {
+                Log.e(TAG, "unable to populate quotes into database");
+            }
         }
 
         private void loadQuotes() throws IOException {
